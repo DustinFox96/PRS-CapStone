@@ -21,5 +21,7 @@ namespace PrsServer.Models {
         public string Email { get; set; }
         public Boolean IsReviewer { get; set; } = false;
         public Boolean IsAdmin { get; set; } = false;
+
+        public User() { }
     }
 }

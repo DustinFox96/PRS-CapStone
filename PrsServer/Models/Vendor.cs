@@ -24,5 +24,7 @@ namespace PrsServer.Models {
         [StringLength(255)]
         public string Email { get; set; }
 
+        public Vendor() { }
+
     }
 }
