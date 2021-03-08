@@ -25,7 +25,9 @@ namespace PrsServer {
             services.AddControllers();
 
     services.AddDbContext<PrsDbContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("PrsServerContext")));
+            options.UseSqlServer(Configuration.GetConnectionString("PrsDB")));
+            services.AddCors();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,6 +35,7 @@ namespace PrsServer {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
             app.UseRouting();
 

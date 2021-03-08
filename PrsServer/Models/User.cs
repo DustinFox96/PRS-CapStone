@@ -15,9 +15,9 @@ namespace PrsServer.Models {
         public string Firstname { get; set; }
         [StringLength(30), Required]
         public string Lastname { get; set; }
-        [StringLength(12), Required]
+        [StringLength(12),]
         public string Phone { get; set; }
-        [StringLength(255), Required]
+        [StringLength(255),]
         public string Email { get; set; }
         public Boolean IsReviewer { get; set; } = false;
         public Boolean IsAdmin { get; set; } = false;

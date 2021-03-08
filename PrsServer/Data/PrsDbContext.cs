@@ -17,7 +17,9 @@ namespace PrsServer.Data
         public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder) {
-            builder.Entity<User>(e => { })
+            builder.Entity<User>(e => {
+                e.HasIndex(u => u.Username).IsUnique(true);
+            });
         }
 
     }

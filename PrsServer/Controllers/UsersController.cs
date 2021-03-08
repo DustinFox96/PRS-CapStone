@@ -21,6 +21,10 @@ namespace PrsServer.Controllers
             _context = context;
         }
 
+        //Get: api/UsersLogin
+        [HttpGet("
+        public
+
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
