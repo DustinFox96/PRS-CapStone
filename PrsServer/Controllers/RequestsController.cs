@@ -21,24 +21,79 @@ namespace PrsServer.Controllers
             _context = context;
         }
 
-        // PUT: api/Requests/Review/5
-        [HttpPut ("edit/{id}")]
-        public async Task<IActionResult> SetRequestStatusToReview(int id)
+        // GET: api/Request/ReviewsGet
+        [HttpGet("ReviewsGet")]
+        public async Task<ActionResult<IEnumerable<Request>>> GetRequestsThatAreSetToReview()
         {
-            var request = await _context.Requests.FindAsync(id);
+            return await _context.Requests
+                                          .Include(u => u.User)
+                                          .Where(r => r.Status == "Review")
+                                          .ToListAsync();
+        }
+
+
+
+        // PUT: api/Requests/Reject/5
+        [HttpPut("Reject/{id}")]
+        public async Task<IActionResult> SetRequestStatusToReject(int id, Request request)
+        {
+            // var request = await _context.Requests.FindAsync(id);
             if(request == null)
             {
-                return NotFound();
+                return BadRequest();
             }
-            request.Status = "Review";
+            request.Status = "Reject";
             return await PutRequest(request.Id, request);
+        }
+
+        // PUT: api/Requests/Approve/5
+        [HttpPut("approve/{id}")]
+        public async Task<IActionResult> SetRequestStatusToApprove(int id, Request request)
+        {
+            
+            if(request == null)
+            {
+                return BadRequest();
+            }
+             request.Status = "Approve";
+            return await PutRequest(request.Id, request);
+        }
+
+
+
+        // PUT: api/Requests/Review/5
+        [HttpPut ("Review/{id}")]
+        public async Task<IActionResult> SetRequestStatusToReview(int id, Request request)
+
+        {
+             // var request = await _context.Requests.FindAsync(id);
+            if(request == null)
+            {
+                return BadRequest();
+            }
+
+            //if(request.Total <= 50.00m)
+            //{
+            //    request.Status = "Approve";
+            //}
+            //else
+            //{
+            //    request.Status = "Review";
+            //}
+            request.Status = (request.Total <= 50) ? "Approve" : "Review";
+            return await PutRequest(request.Id, request);
+            //request.Status = "Review";
+            //return await PutRequest(request.Id, request);
         }
 
         // GET: api/Requests
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Request>>> GetRequests()
         {
-            return await _context.Requests.ToListAsync();
+            return await _context.Requests
+                                          .Include(u => u.User)
+                                          .ToListAsync();
+                                          
         }
 
         // GET: api/Requests/5
