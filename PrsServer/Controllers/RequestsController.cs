@@ -21,6 +21,19 @@ namespace PrsServer.Controllers
             _context = context;
         }
 
+        // PUT: api/Requests/Review/5
+        [HttpPut ("edit/{id}")]
+        public async Task<IActionResult> SetRequestStatusToReview(int id)
+        {
+            var request = await _context.Requests.FindAsync(id);
+            if(request == null)
+            {
+                return NotFound();
+            }
+            request.Status = "Review";
+            return await PutRequest(request.Id, request);
+        }
+
         // GET: api/Requests
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Request>>> GetRequests()
