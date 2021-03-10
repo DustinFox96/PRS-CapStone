@@ -21,18 +21,43 @@ namespace PrsServer.Controllers
             _context = context;
         }
 
+
+       private async Task<IActionResult> CalculateRequestTotal(int id)
+        {
+            var request = await _context.Requests.FindAsync(id);
+                if (request == null)
+            {
+                return NotFound();
+            }
+            request.Total = await _context.RequestLines
+                                                 .Where(rl => rl.RequestId == id)
+                                                 .SumAsync(rl => rl.Quantity * rl.Product.Price);
+            var rowsAffected = await _context.SaveChangesAsync();
+            if(rowsAffected != 1)
+            {
+                throw new Exception("Failed to update order Total");
+            }
+            return Ok();
+        }
+        
+
+
         // GET: api/RequestLines
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RequestLine>>> GetRequestLines()
         {
-            return await _context.RequestLines.ToListAsync();
+            return await _context.RequestLines
+                                              .Include(p => p.Product)
+                                              .ToListAsync();
         }
 
         // GET: api/RequestLines/5
         [HttpGet("{id}")]
         public async Task<ActionResult<RequestLine>> GetRequestLine(int id)
         {
-            var requestLine = await _context.RequestLines.FindAsync(id);
+            var requestLine = await _context.RequestLines
+                                                         .Include(p => p.Product)
+                                                         .SingleOrDefaultAsync(rl => rl.Id == id);
 
             if (requestLine == null)
             {
@@ -58,6 +83,7 @@ namespace PrsServer.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                await CalculateRequestTotal(requestLine.RequestId);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -81,7 +107,13 @@ namespace PrsServer.Controllers
         public async Task<ActionResult<RequestLine>> PostRequestLine(RequestLine requestLine)
         {
             _context.RequestLines.Add(requestLine);
+            await CalculateRequestTotal(requestLine.RequestId);
             await _context.SaveChangesAsync();
+
+            if(requestLine.Quantity <= 0)
+            {
+                throw new Exception("Quantity must be greater than zero");
+            }
 
             return CreatedAtAction("GetRequestLine", new { id = requestLine.Id }, requestLine);
         }
@@ -98,6 +130,7 @@ namespace PrsServer.Controllers
 
             _context.RequestLines.Remove(requestLine);
             await _context.SaveChangesAsync();
+            await CalculateRequestTotal(requestLine.RequestId);
 
             return requestLine;
         }
