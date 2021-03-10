@@ -106,14 +106,14 @@ namespace PrsServer.Controllers
         [HttpPost]
         public async Task<ActionResult<RequestLine>> PostRequestLine(RequestLine requestLine)
         {
-            _context.RequestLines.Add(requestLine);
-            await CalculateRequestTotal(requestLine.RequestId);
-            await _context.SaveChangesAsync();
 
             if(requestLine.Quantity <= 0)
             {
                 throw new Exception("Quantity must be greater than zero");
             }
+            _context.RequestLines.Add(requestLine);
+            await _context.SaveChangesAsync();
+            await CalculateRequestTotal(requestLine.RequestId);
 
             return CreatedAtAction("GetRequestLine", new { id = requestLine.Id }, requestLine);
         }
