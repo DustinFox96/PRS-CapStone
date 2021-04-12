@@ -33,10 +33,10 @@ namespace PrsServer.Controllers
                                                  .Where(rl => rl.RequestId == id)
                                                  .SumAsync(rl => rl.Quantity * rl.Product.Price);
             var rowsAffected = await _context.SaveChangesAsync();
-            if(rowsAffected != 1)
-            {
-                throw new Exception("Failed to update order Total");
-            }
+            //if(rowsAffected != 1)
+            //{
+            //    throw new Exception("Failed to update order Total");
+            //}
             return Ok();
         }
         

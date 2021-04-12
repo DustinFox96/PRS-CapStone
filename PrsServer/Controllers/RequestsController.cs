@@ -22,12 +22,12 @@ namespace PrsServer.Controllers
         }
 
         // GET: api/Request/ReviewsGet
-        [HttpGet("ReviewsGet")]
-        public async Task<ActionResult<IEnumerable<Request>>> GetRequestsThatAreSetToReview()
+        [HttpGet("ReviewsGet/{id}")]
+        public async Task<ActionResult<IEnumerable<Request>>> GetRequestsThatAreSetToReview(int id)
         {
             return await _context.Requests
                                           .Include(u => u.User)
-                                          .Where(r => r.Status == "Review")
+                                          .Where(r => r.Status == "Review" && r.UserId != id)
                                           .ToListAsync();
         }
 
@@ -100,7 +100,15 @@ namespace PrsServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Request>> GetRequest(int id)
         {
-            var request = await _context.Requests.FindAsync(id);
+            var request = await _context.Requests
+                                                 .Include(u => u.User)
+                                                 .Include(r => r.RequestLines)
+                                                 .ThenInclude(p => p.Product)
+                                                 .SingleOrDefaultAsync(p => p.Id == id);
+
+
+
+                /*.FindAsync(id);*/
 
             if (request == null)
             {
